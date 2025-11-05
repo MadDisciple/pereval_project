@@ -6,7 +6,7 @@ from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERRO
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from . import models, schemas, services, database
+import models, schemas, services, database
 
 models.Base.metadata.create_all(bind=database.engine)
 

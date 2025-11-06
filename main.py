@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import List
 import models, schemas, services, database
 
-models.Base.metadata.create_all(bind=database.engine)
+#models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
 

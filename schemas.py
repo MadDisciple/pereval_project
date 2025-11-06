@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import List, Optional
 import datetime
 
@@ -36,19 +36,7 @@ class PerevalInputSchema(BaseModel):
     level: LevelSchema
     images: List[ImageSchema]
 
-    class Config:
-        populate_by_name = True
-
-
-class PerevalResponseSchema(BaseModel):
-    status: int
-    message: str
-    id: Optional[int] = None
-
-
-from typing import List, Optional
-
-
+    model_config = ConfigDict(populate_by_name=True)
 
 class UserOutputSchema(BaseModel):
     email: EmailStr
@@ -56,27 +44,18 @@ class UserOutputSchema(BaseModel):
     name: str
     otc: Optional[str] = None
     phone: str
-
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 
 class CoordsOutputSchema(BaseModel):
     latitude: float
     longitude: float
     height: int
-
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 
 class ImageOutputSchema(BaseModel):
     data: str
     title: str
-
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 
 class PerevalOutputSchema(BaseModel):
     id: int
@@ -96,10 +75,7 @@ class PerevalOutputSchema(BaseModel):
     level_spring: Optional[str] = Field(alias="level_spring", default=None)
     level_autumn: Optional[str] = Field(alias="level_autumn", default=None)
 
-    class Config:
-        from_attributes = True
-        populate_by_name = True
-
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class CoordsUpdateSchema(BaseModel):
@@ -107,33 +83,31 @@ class CoordsUpdateSchema(BaseModel):
     longitude: Optional[float] = None
     height: Optional[int] = None
 
-
 class LevelUpdateSchema(BaseModel):
     winter: Optional[str] = None
     summer: Optional[str] = None
     autumn: Optional[str] = None
     spring: Optional[str] = None
 
-
 class ImageUpdateSchema(BaseModel):
     data: Optional[str] = None
     title: Optional[str] = None
-
 
 class PerevalUpdateSchema(BaseModel):
     beauty_title: Optional[str] = Field(alias='beauty_title', default=None)
     title: Optional[str] = None
     other_titles: Optional[str] = Field(alias='other_titles', default=None)
     connect: Optional[str] = None
-
-
     coords: Optional[CoordsUpdateSchema] = None
     level: Optional[LevelUpdateSchema] = None
     images: Optional[List[ImageUpdateSchema]] = None
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
+class PerevalResponseSchema(BaseModel):
+    status: int
+    message: str
+    id: Optional[int] = None
 
 class UpdateResponseSchema(BaseModel):
     state: int

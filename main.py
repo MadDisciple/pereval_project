@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-
+from typing import List
 import models, schemas, services, database
 
 models.Base.metadata.create_all(bind=database.engine)
@@ -48,6 +48,40 @@ def create_pereval(pereval_input: schemas.PerevalInputSchema, db: Session = Depe
 
     except Exception as e:
         raise e
+
+@app.get("/submitData/{id}", response_model=schemas.PerevalOutputSchema)
+def get_pereval_by_id(id: int, db: Session = Depends(database.get_db)):
+    pereval = services.get_pass_by_id(db, id)
+    if not pereval:
+        raise HTTPException(status_code=404, detail=f"Перевал с id={id} не найден")
+    return pereval
+
+@app.get("/submitData/", response_model=List[schemas.PerevalOutputSchema])
+def get_perevals_by_user_email(user__email: str, db: Session = Depends(database.get_db)):
+    passes = services.get_passes_by_email(db, user__email)
+    return passes
+
+@app.patch("/submitData/{id}", response_model=schemas.UpdateResponseSchema)
+def update_pereval_by_id(id: int, pereval_update: schemas.PerevalUpdateSchema, db: Session = Depends(database.get_db)):
+    state, message = services.update_pass_by_id(db, id, pereval_update)
+
+    if state == 0 and "не найден" in message:
+         return JSONResponse(
+            status_code=404,
+            content={"state": 0, "message": message}
+        )
+    if state == 0 and "Нельзя редактировать" in message:
+         return JSONResponse(
+            status_code=403,
+            content={"state": 0, "message": message}
+        )
+    if state == 0:
+         return JSONResponse(
+            status_code=500,
+            content={"state": 0, "message": message}
+        )
+
+    return {"state": state, "message": message}
 
 
 if __name__ == "__main__":
